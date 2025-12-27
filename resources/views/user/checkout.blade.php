@@ -37,10 +37,12 @@
                     <p class="text-[9px] font-bold uppercase text-zinc-500 mt-2">A/N ARC MEDIA CREATIVE</p>
                 </div>
 
-                <a href="https://wa.me/6281234567890?text=Halo%20Admin%2C%20saya%20sudah%20transfer%20untuk%20kursus%20{{ $academy->title }}" 
-                   class="w-full block text-center bg-red-600 hover:bg-white hover:text-black text-white font-black uppercase py-4 rounded-2xl tracking-[0.2em] text-[10px] transition-all duration-500 shadow-xl shadow-red-900/20">
-                    Confirm via WhatsApp
-                </a>
+                <form action="{{ route('checkout.store', $academy->id) }}" method="POST">
+                    @csrf
+                    <button type="submit" class="w-full bg-green-600 text-white font-black py-4 rounded-xl uppercase hover:bg-green-700 transition">
+                        Konfirmasi Pembayaran & Mulai Belajar
+                    </button>
+                </form>
                 
                 <a href="{{ route('user.home') }}" class="w-full block text-center text-zinc-600 hover:text-zinc-400 font-bold uppercase py-2 tracking-[0.2em] text-[8px] transition-all">
                     Cancel and Return

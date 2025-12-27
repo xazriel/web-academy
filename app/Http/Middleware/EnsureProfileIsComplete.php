@@ -21,11 +21,11 @@ class EnsureProfileIsComplete
 
             // Tentukan kolom mana saja yang WAJIB diisi
             // Jika salah satu kosong, maka dianggap tidak lengkap
-            if (empty($user->phone_number) || empty($user->institution) || empty($user->gender)) {
+            if (empty($user->phone) || empty($user->occupation_status) || empty($user->gender)) {
                 
                 // Supaya tidak terjadi error "Too many redirects", 
                 // pastikan middleware tidak memblokir saat user sudah berada di halaman profil atau logout
-                if (!$request->is('profile*') && !$request->is('logout')) {
+                if (!$request->is('settings/profile*') && !$request->is('logout')) {
                     return redirect()->route('profile.edit')
                         ->with('warning', 'Selesaikan profilmu dulu yuk untuk lanjut ke ARC Academy!');
                 }

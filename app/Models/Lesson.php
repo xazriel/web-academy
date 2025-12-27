@@ -14,6 +14,8 @@ class Lesson extends Model
         'academy_id',
         'section_title',
         'title',
+        'slug',          // Tambahkan ini
+        'content',       // Tambahkan ini untuk isi materi teks
         'video_url',
         'order'
     ];

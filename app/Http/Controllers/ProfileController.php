@@ -41,6 +41,24 @@ class ProfileController extends Controller
         $user->update($validated);
 
         // Setelah sukses, arahkan ke dashboard
-        return redirect()->route('dashboard')->with('success', 'Profil lengkap! Kamu sekarang bisa mengakses ARC Academy.');
+        return redirect()->route('user.home')->with('success', '👍');
     }
+
+    public function showPublic($id)
+{
+    // 1. Ambil data user beserta sertifikatnya (tanpa memanggil 'profile' karena tidak ada)
+    $user = \App\Models\User::with(['certificates.academy'])->findOrFail($id);
+
+    // 2. Ambil jumlah kursus yang diikuti (enrollments)
+    $coursesCount = \App\Models\Enrollment::where('user_id', $id)->count();
+
+    // 3. Ambil jumlah materi yang sudah diselesaikan (jika relasi sudah ada di model User)
+    // Jika belum ada relasi completedLessons, biarkan 0 dulu atau sesuaikan
+    $completedLessonsCount = method_exists($user, 'completedLessons') 
+        ? $user->completedLessons()->count() 
+        : 0;
+
+    // 4. Pastikan path view benar (kamu tadi pakai user.profile.public)
+    return view('profile.public', compact('user', 'coursesCount', 'completedLessonsCount'));
+}
 }

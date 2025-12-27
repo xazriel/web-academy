@@ -109,7 +109,7 @@
                     </a>
 
                     @auth
-                    <a href="{{ route('home') }}" class="group mt-4 flex items-center gap-2">
+                    <a href="{{ route('user.home') }}" class="group mt-4 flex items-center gap-2">
                         <span class="text-arc-blue font-black uppercase italic tracking-tighter text-xl border-b-4 border-arc-blue group-hover:text-black group-hover:border-black transition-all">
                             Go back to your dashboard
                         </span>
@@ -146,9 +146,12 @@
                                 {{ number_format($item->price / 1000) }}K
                             </span>
                         </div>
-                        <a href="{{ route('academies.show', $item->slug) }}" class="bg-arc-blue text-white font-black text-xl w-full py-5 border-4 border-arc-black shadow-[8px_8px_0_#00001b] hover:shadow-none transition-all">
+                        <form action="{{ route('checkout.store', $item->id) }}" method="POST">
+                        @csrf
+                        <button type="submit" class="bg-arc-yellow border-4 border-black p-4 font-black uppercase shadow-[8px_8px_0_#000] hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none transition-all">
                             JOIN NOW
-                        </a>
+                        </button>
+                    </form>
                     </div>
                     @empty
                     <div class="col-span-3 text-center py-20 opacity-20 font-black text-4xl uppercase">No Classes Yet</div>

@@ -36,4 +36,10 @@ public function isEnrolled()
 {
     return $this->enrollments()->where('user_id', auth()->id())->exists();
 }
+
+public function quizzes()
+{
+    return $this->hasMany(Quiz::class);
+}
+
 }

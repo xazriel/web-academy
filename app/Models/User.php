@@ -80,9 +80,22 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     protected function isAdmin(): \Illuminate\Database\Eloquent\Casts\Attribute
-{
+    {
     return \Illuminate\Database\Eloquent\Casts\Attribute::make(
         get: fn () => $this->role === 'admin',
     );
-}
+    }
+
+    public function completedLessons()
+    {
+    return $this->belongsToMany(Lesson::class, 'lesson_user')->withTimestamps();
+    }
+    public function discussions()
+    {
+    return $this->hasMany(Discussion::class);
+    }
+    public function certificates()
+    {
+    return $this->hasMany(Certificate::class);
+    }
 }

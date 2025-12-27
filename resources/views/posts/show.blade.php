@@ -10,6 +10,12 @@
 <body class="antialiased">
     <nav class="p-6 border-b border-white/5">
         <a href="/" class="text-red-600 font-black text-xl tracking-tighter uppercase">← Back to Home</a>
+        <form action="{{ route('user.lesson.complete', [$academy->id, $currentLesson->id]) }}" method="POST">
+    @csrf
+    <button type="submit" class="bg-black text-white px-8 py-4 font-black uppercase hover:bg-arc-yellow hover:text-black transition-all border-4 border-black shadow-[6px_6px_0_#2227f7]">
+        Selesai & Lanjut →
+    </button>
+</form>
     </nav>
 
     <main class="max-w-4xl mx-auto px-6 py-20">

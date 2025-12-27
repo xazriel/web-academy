@@ -5,26 +5,25 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Enrollment extends Model
+class Certificate extends Model
 {
     use HasFactory;
 
-    // NOTE: Tambahkan baris ini untuk mengizinkan input data ke kolom berikut
+    // WAJIB: Daftarkan kolom yang boleh diisi
     protected $fillable = [
         'user_id',
         'academy_id',
-        'enrolled_at',
-        'status',
-        'progress_percent',
+        'certificate_number',
+        'issued_at'
     ];
 
-    // Opsional: Hubungkan kembali ke User
+    // Relasi ke User
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    // Opsional: Hubungkan kembali ke Academy
+    // Relasi ke Academy
     public function academy()
     {
         return $this->belongsTo(Academy::class);

@@ -194,5 +194,16 @@
         </form>
     </div>
 
+    @if ($errors->any())
+    <div class="mb-10 bg-red-500 border-8 border-black p-6 shadow-[12px_12px_0_#000] text-white">
+        <p class="font-black uppercase italic text-2xl tracking-tighter">ERROR DETECTED!</p>
+        <ul class="list-disc list-inside font-bold uppercase text-xs mt-2">
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+
 </body>
 </html>

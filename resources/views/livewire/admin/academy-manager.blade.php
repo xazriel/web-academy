@@ -5,6 +5,7 @@
         </div>
     @endif
 
+    {{-- FORM INPUT (BAGIAN ATAS) --}}
     <form wire:submit.prevent="save" class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-black p-8 rounded-[2rem] border border-white/5 shadow-2xl">
         <div class="space-y-4">
             <div>
@@ -72,13 +73,14 @@
         </div>
     </form>
 
+    {{-- TABEL ACADEMY (BAGIAN BAWAH) --}}
     <div class="overflow-x-auto bg-zinc-900/30 rounded-[2rem] border border-white/5 shadow-xl">
         <table class="w-full text-left border-collapse">
             <thead>
                 <tr class="text-[10px] uppercase tracking-widest text-gray-500 border-b border-white/5">
                     <th class="p-6">Thumbnail</th>
                     <th class="p-6">Course Details</th>
-                    <th class="p-6 text-center">Price</th>
+                    <th class="p-6 text-center border-x border-white/5">Price</th>
                     <th class="p-6 text-right">Actions</th>
                 </tr>
             </thead>
@@ -87,32 +89,51 @@
                 <tr class="hover:bg-white/[0.02] transition group">
                     <td class="p-6">
                         @if($academy->thumbnail)
-                            <img src="{{ asset('storage/' . $academy->thumbnail) }}" class="h-12 w-20 object-cover rounded-lg border border-white/10 group-hover:border-red-600/50 transition">
+                            <img src="{{ asset('storage/' . $academy->thumbnail) }}" class="h-12 w-20 object-cover rounded-lg border border-white/10 group-hover:border-red-600/50 transition shadow-lg">
                         @else
                             <div class="h-12 w-20 bg-zinc-800 rounded-lg border border-white/10 flex items-center justify-center text-[8px] text-gray-600 font-black italic uppercase">No Img</div>
                         @endif
                     </td>
                     <td class="p-6">
                         <div class="flex flex-col">
-                            <span class="text-gray-500 text-[9px] font-black uppercase tracking-widest mb-1">{{ $academy->category }}</span>
-                            <span class="font-bold text-sm text-white italic uppercase tracking-tighter">{{ $academy->title }}</span>
-                            <span class="text-[9px] text-gray-600 font-medium normal-case line-clamp-1 mt-1">{{ $academy->instructor_name }}</span>
+                            <span class="text-red-600 text-[9px] font-black uppercase tracking-widest mb-1">{{ $academy->category }}</span>
+                            <span class="font-bold text-sm text-white italic uppercase tracking-tighter leading-tight">{{ $academy->title }}</span>
+                            <span class="text-[9px] text-gray-600 font-medium normal-case line-clamp-1 mt-1 italic tracking-widest">{{ $academy->instructor_name }}</span>
                         </div>
                     </td>
-                    <td class="p-6 text-center">
-                        <span class="text-red-600 font-black-italic italic tracking-tighter text-lg">{{ number_format($academy->price/1000) }}K</span>
+                    <td class="p-6 text-center border-x border-white/5">
+                        <span class="text-red-600 font-black italic italic tracking-tighter text-lg">{{ number_format($academy->price/1000) }}K</span>
                     </td>
                     <td class="p-6 text-right">
-                        {{-- TOMBOL DELETE DENGAN KONFIRMASI --}}
-                        <button 
-                            wire:click="delete({{ $academy->id }})" 
-                            wire:confirm="Are you sure you want to delete this course?"
-                            class="bg-zinc-800 hover:bg-red-600/10 text-red-600 p-3 rounded-xl transition-all duration-300 border border-white/5"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                        </button>
+                        <div class="flex justify-end items-center gap-2">
+                            {{-- TOMBOL MANAGE QUIZ (NEW INDIGO) --}}
+                            <a href="{{ route('admin.quiz.index', $academy->id) }}" 
+                               class="bg-zinc-800 hover:bg-indigo-600 text-zinc-400 hover:text-white p-2.5 rounded-xl transition-all duration-300 border border-white/5 group/quiz"
+                               title="Manage Quiz">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                </svg>
+                            </a>
+
+                            {{-- TOMBOL MANAGE CONTENT (BLUE) --}}
+                            <a href="{{ route('admin.academies.content', $academy->id) }}" 
+                               class="bg-zinc-800 hover:bg-blue-600 text-zinc-400 hover:text-white p-2.5 rounded-xl transition-all duration-300 border border-white/5 group/btn"
+                               title="Manage Materials">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                </svg>
+                            </a>
+
+                            {{-- TOMBOL DELETE (RED) --}}
+                            <button wire:click="delete({{ $academy->id }})" 
+                                    wire:confirm="Are you sure you want to delete this course?"
+                                    class="bg-zinc-800 hover:bg-red-600 text-red-600 hover:text-white p-2.5 rounded-xl transition-all duration-300 border border-white/5"
+                                    title="Delete Course">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </button>
+                        </div>
                     </td>
                 </tr>
                 @endforeach

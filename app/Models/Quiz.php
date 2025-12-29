@@ -11,6 +11,7 @@ class Quiz extends Model
 
     protected $fillable = [
         'academy_id',
+        'lesson_id', 
         'question',
         'option_a',
         'option_b',
@@ -23,4 +24,10 @@ class Quiz extends Model
     {
         return $this->belongsTo(Academy::class);
     }
+
+    public function lesson() 
+    {
+    return $this->belongsTo(Lesson::class, 'lesson_id');
+    }
+    
 }

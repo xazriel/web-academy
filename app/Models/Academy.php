@@ -27,19 +27,24 @@ class Academy extends Model
         return $this->hasMany(Lesson::class);
     }
 
+    public function chapters(): HasMany
+    {
+    return $this->hasMany(Chapter::class)->orderBy('order', 'asc');    
+    }
+
     public function enrollments()
-{
-    return $this->hasMany(Enrollment::class);
-}
+    {
+        return $this->hasMany(Enrollment::class);
+    }
 
-public function isEnrolled()
-{
-    return $this->enrollments()->where('user_id', auth()->id())->exists();
-}
+    public function isEnrolled()
+    {
+        return $this->enrollments()->where('user_id', auth()->id())->exists();
+    }
 
-public function quizzes()
-{
-    return $this->hasMany(Quiz::class);
-}
+    public function quizzes()
+    {
+        return $this->hasMany(Quiz::class);
+    }
 
 }

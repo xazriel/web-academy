@@ -16,6 +16,9 @@ use App\Http\Controllers\CourseController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\DiscussionController;
 use App\Http\Controllers\QuizController;
+use App\Http\Controllers\ChapterController;
+use App\Http\Controllers\User\QuizController as UserQuizController;
+use App\Http\Controllers\QuizController as AdminQuizController;
 
 /*
 |--------------------------------------------------------------------------
@@ -68,46 +71,48 @@ Route::middleware(['auth', 'verified'])->group(function () {
     /* --- B. AREA TERKUNCI (Wajib Lengkap Profil) --- */
     Route::middleware(['profile.complete'])->group(function () {
     
-    Route::get('/my-learning', [CourseController::class, 'myLearning'])->name('user.my-learning')->middleware(['auth', 'verified']);
-    Route::get('/course/{id}/quiz', [QuizController::class, 'show'])->name('user.quiz.show');
-    Route::post('/course/{id}/quiz', [QuizController::class, 'submit'])->name('user.quiz.submit');
-    Route::delete('/admin/quiz/{id}', [QuizController::class, 'destroy'])->name('admin.quiz.destroy');
+        Route::get('/my-learning', [CourseController::class, 'myLearning'])->name('user.my-learning');
 
-    // 1. Pindahkan route Sertifikat ke ATAS agar tidak tertabrak route course
-    Route::get('/certificate/print/{id}', function($id) {
-    $certificate = App\Models\Certificate::with('academy')->findOrFail($id);
-    // Tambahkan variabel academy di sini
-    return view('user.certificate.print', [
-        'certificate' => $certificate,
-        'academy' => $certificate->academy // Ini yang melengkapi kepingan puzzle yang hilang
-    ]);
-    })->name('certificate.print');
+        // --- KUIS USER ---
+        Route::get('/course/{id}/quiz', [UserQuizController::class, 'show'])->name('user.quiz.show');
+        Route::post('/course/{id}/quiz/submit', [UserQuizController::class, 'submit'])->name('user.quiz.submit');
 
-    // 2. Dashboard Utama User
-    Route::get('/home', function () {
-        $news = Post::where('status', 'published')->latest()->take(3)->get();
-        $academies = Academy::latest()->take(3)->get();
-        return view('user.home', compact('news', 'academies'));
-    })->name('user.home');
+        // --- SERTIFIKAT ---
+        Route::get('/certificate/print/{id}', function($id) {
+            $certificate = App\Models\Certificate::with('academy')->findOrFail($id);
+            return view('user.certificate.print', [
+                'certificate' => $certificate,
+                'academy' => $certificate->academy 
+            ]);
+        })->name('certificate.print');
 
-    // 3. Checkout & Enrollment
-    Route::get('/checkout/{slug}', [CheckoutController::class, 'index'])->name('checkout');
-    Route::post('/checkout/{id}', [App\Http\Controllers\CourseController::class, 'enroll'])->name('checkout.store');
-    
-    // 4. Sertifikat Claim
-    Route::get('/course/{id}/claim', [App\Http\Controllers\CourseController::class, 'claimCertificate'])->name('user.course.claim');
+        // --- DASHBOARD USER ---
+        Route::get('/home', function () {
+            $news = Post::where('status', 'published')->latest()->take(3)->get();
+            $academies = Academy::latest()->take(3)->get();
+            return view('user.home', compact('news', 'academies'));
+        })->name('user.home');
 
-    Route::get('/course/{id}/quiz', [CourseController::class, 'showQuiz'])->name('user.quiz.show');
-    Route::post('/course/{id}/quiz', [CourseController::class, 'submitQuiz'])->name('user.quiz.submit');
+        // --- CHECKOUT & ENROLLMENT ---
+        Route::get('/checkout/{slug}', [CheckoutController::class, 'index'])->name('checkout');
+        Route::post('/checkout/{id}', [App\Http\Controllers\CourseController::class, 'enroll'])->name('checkout.store');
+        
+        // --- PROGRESS & CLAIM ---
+        Route::get('/course/{id}/claim', [App\Http\Controllers\CourseController::class, 'claimCertificate'])->name('user.course.claim');
+        Route::post('/course/{academy_id}/lesson/{lesson_id}/complete', [CourseController::class, 'completeLesson'])->name('user.lesson.complete');
+        
+        // --- DISKUSI / AFTER CLASS CHAT ---
+        // Route ini harus di atas route belajar agar tidak tertukar dengan slug
+        Route::get('/course/{id}/discussion', [DiscussionController::class, 'index'])->name('user.discussion.show');
+        Route::get('/course/{id}/discussion/{discussion_id}', [DiscussionController::class, 'show'])->name('user.discussion.detail');
+        Route::post('/course/{id}/discussion/store', [DiscussionController::class, 'store'])->name('user.discussion.store');
+        
+        // --- PROFIL PUBLIK ---
+        Route::get('/member/{id}', [App\Http\Controllers\ProfileController::class, 'showPublic'])->name('profile.public');
 
-    // 5. Belajar (Route ini harus paling bawah karena menggunakan parameter opsional {slug?})
-    Route::get('/course/{id}/{slug?}', [CourseController::class, 'show'])->name('user.course');
-    
-    // 6. Progress & Diskusi
-    Route::post('/course/{academy_id}/lesson/{lesson_id}/complete', [CourseController::class, 'completeLesson'])->name('user.lesson.complete');
-    Route::post('/discussion/{lesson_id}', [DiscussionController::class, 'store'])->name('discussion.store');
-    Route::get('/member/{id}', [App\Http\Controllers\ProfileController::class, 'showPublic'])->name('profile.public');
-});
+        // --- BELAJAR (Paling Bawah karena ada parameter slug opsional) ---
+        Route::get('/course/{id}/{slug?}', [CourseController::class, 'show'])->name('user.course');
+    });
 });
 
 
@@ -131,15 +136,25 @@ Route::middleware(['auth', 'verified', 'is_admin'])
 
         // Management Isi Materi (Lessons)
         Route::get('/academies/{id}/content', function ($id) {
-            $academy = \App\Models\Academy::with('lessons')->findOrFail($id);
+            $academy = \App\Models\Academy::with(['chapters.lessons' => function($query) {
+                $query->orderBy('order', 'asc');
+            }])->findOrFail($id);
             return view('admin.academies.content', compact('academy'));
         })->name('admin.academies.content');
 
-        // Route simpan lesson
+        // Route Bab & Lesson
+        Route::post('/academies/{academy_id}/chapters', [ChapterController::class, 'store'])->name('admin.chapters.store');
         Route::post('/academies/{academy_id}/lessons', [LessonController::class, 'store'])->name('admin.lessons.store');
 
-        //Route CRUD quiz
-        Route::get('/academies/{id}/quiz', [App\Http\Controllers\QuizController::class, 'index'])->name('admin.quiz.index');
-        Route::post('/academies/{id}/quiz', [App\Http\Controllers\QuizController::class, 'store'])->name('admin.quiz.store');
+        Route::delete('/chapters/{id}', [ChapterController::class, 'destroy'])->name('admin.chapters.destroy');
+        Route::delete('/lessons/{id}', [LessonController::class, 'destroy'])->name('admin.lessons.destroy');
 
+        Route::get('/lessons/{id}/edit', [LessonController::class, 'edit'])->name('admin.lessons.edit');
+        Route::put('/lessons/{id}', [LessonController::class, 'update'])->name('admin.lessons.update');
+        Route::post('/lessons/reorder', [LessonController::class, 'reorder'])->name('admin.lessons.reorder');
+
+        // Route Management Quiz (Admin Area)
+        Route::get('/academies/{id}/quiz', [QuizController::class, 'index'])->name('admin.quiz.index');
+        Route::post('/academies/{id}/quiz', [QuizController::class, 'store'])->name('admin.quiz.store');
+        Route::delete('/quiz/{id}', [QuizController::class, 'destroy'])->name('admin.quiz.destroy');
     });

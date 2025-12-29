@@ -12,10 +12,11 @@ class Lesson extends Model
 
     protected $fillable = [
         'academy_id',
+        'chapter_id',
         'section_title',
         'title',
-        'slug',          // Tambahkan ini
-        'content',       // Tambahkan ini untuk isi materi teks
+        'slug',          
+        'content',       
         'video_url',
         'order'
     ];
@@ -27,4 +28,18 @@ class Lesson extends Model
     {
         return $this->belongsTo(Academy::class);
     }
+
+    public function getYoutubeIdAttribute()
+    {
+    if (!$this->video_url) return null;
+    
+    preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^"&?/ ]{11})%i', $this->video_url, $match);
+    
+    return $match[1] ?? null;
+    }
+
+    public function quizzes() {
+    return $this->hasMany(Quiz::class);
+}
+
 }

@@ -10,7 +10,6 @@ class ChapterController extends Controller
 {
     $request->validate(['title' => 'required|string|max:255']);
 
-    // Ambil order terakhir agar otomatis urut
     $lastOrder = \App\Models\Chapter::where('academy_id', $academy_id)->max('order') ?? 0;
 
     \App\Models\Chapter::create([
@@ -20,5 +19,13 @@ class ChapterController extends Controller
     ]);
 
     return back()->with('success', 'Bab baru berhasil ditambahkan!');
+}
+    public function destroy($id)
+{
+    $chapter = Chapter::findOrFail($id);
+    // Hapus semua lesson di dalam chapter ini dulu (opsional, tergantung setting DB)
+    $chapter->lessons()->delete(); 
+    $chapter->delete();
+    return back()->with('success', 'Bab dan seluruh materinya berhasil dihapus!');
 }
 }

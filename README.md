@@ -44,7 +44,3 @@ Project ini terinspirasi dari platform pembelajaran online seperti **Coursera** 
 - **Authentication:** Laravel Authentication
 - **Package Manager:** Composer & NPM
 
----
-
-## 📁 Struktur Project
-
